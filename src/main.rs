@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::error::Error;
 fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
@@ -9,9 +10,9 @@ fn main() {
     println!("query = {}", config.query);
     println!("filename = {}", config.filename);
 
-    let contents = run(config);
+    run(config);
 
-    println!("Text of tile:\n{}", contents);
+  
 
     
     // create a parse command function for query and filename
@@ -34,8 +35,10 @@ impl Config {
     }    
 }
 
-fn run(config: Config) -> String {
-    fs::read_to_string(config.filename)
-        .expect("unable to read file")
+fn run(config: Config) -> Result<String, Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
+    
+    println!("Text of tile:\n{}", contents);
+    Ok(contents)
 }
 
