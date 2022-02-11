@@ -1,10 +1,11 @@
 use std::fs;
 use std::error::Error;
-
+use std::env;
 // config that occurs after parsing arguments from CLI
 pub struct Config {
     pub query: String,
     pub filename: String,
+    pub case_sensitive: bool,
 }
 
 impl Config {
@@ -15,16 +16,24 @@ impl Config {
         let query = &args[1].clone();
         let filename = &args[2].clone();
 
-        Ok(Config { query: query.to_string() , filename: filename.to_string() })
+        let case_sensitive = env::var("CASE_SENSITIVE").is_err();
+
+        Ok(Config { query: query.to_string() , filename: filename.to_string(), case_sensitive })
     }    
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
     
-    for line in  search(&config.query, &contents){
+    let results =if config.case_sensitive {
+        search(&config.query, &contents)
+    } else {
+        search_case_sensitive(&config.query, &contents)  
+    };
+    for line in results {
         println!("{}", line)
     }
+    
     Ok(())
 }
 // this function will need to implement lifetimes
@@ -35,6 +44,21 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     for i in contents.lines() {
        // println!(" new line{}", i);
         if i.contains(query) {
+            t.push(i);
+            //println!("{:?}", t)
+        }
+        
+    }
+    t
+}
+
+pub fn search_case_sensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+    let mut t = Vec::new();
+    
+    for i in contents.lines() {
+       // println!(" new line{}", i);
+        if i.to_lowercase().contains(&query) {
             t.push(i);
             //println!("{:?}", t)
         }
