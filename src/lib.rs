@@ -19,11 +19,13 @@ impl Config {
     }    
 }
 
-pub fn run(config: Config) -> Result<String, Box<dyn Error>> {
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
     
-    println!("Text of tile:\n{}", contents);
-    Ok(contents)
+    for line in  search(&config.query, &contents){
+        println!("{}", line)
+    }
+    Ok(())
 }
 // this function will need to implement lifetimes
 // contents will only have lifetime of this function in order to search
@@ -34,7 +36,7 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
        // println!(" new line{}", i);
         if i.contains(query) {
             t.push(i);
-            println!("{:?}", t)
+            //println!("{:?}", t)
         }
         
     }
