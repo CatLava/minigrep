@@ -40,16 +40,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 // contents will only have lifetime of this function in order to search
 // need lifetimes here to reference borrowing
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut t = Vec::new();
-    for i in contents.lines() {
-       // println!(" new line{}", i);
-        if i.contains(query) {
-            t.push(i);
-            //println!("{:?}", t)
-        }
-        
-    }
-    t
+    contents.lines()
+        .filter(|line| line.contains(query) )
+        .collect()
 }
 
 pub fn search_case_sensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
